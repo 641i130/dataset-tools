@@ -1,12 +1,15 @@
 # dataset-tools
 Python tools to build ai datasets
-# Dataset Workflow
+
+Currently, the following files and workflows are structured for building a dataset for use with VITS/so-vits-svc. These are text to audio or audio to audio ai systems. 
+
+# VITS Dataset Workflow
 
 This assumes you're using a Linux system (or WSL) with modern `python3` and `sox`. 
 
-1. First, download the stream(s) you want to use for the dataset. The requirements are, it must be as clean as possible, and primarily the target voice talking a ton. Streams like Minecraft streams tend to be ideal. (This uses [yt-dlp](https://github.com/yt-dlp/yt-dlp))
+1. First, download the stream(s) you want to use for the dataset. The requirements for the stream are as follows: the less background noise/music the better, and primarily the target voice talking a ton (more talking = more data). Minecraft livestreams seem to be pretty good from what I've tested. (This uses [yt-dlp](https://github.com/yt-dlp/yt-dlp))
    Use the command below to download the stream(s):
-   `yt-dlp -f ba -x --audio-format "wav" --audio-quality 0 --embed-metadata https://youtu.be/omegalul`
+   `yt-dlp -f ba -x --audio-format "wav" --audio-quality 0 --embed-metadata https://youtu.be/dh4s0bBrPx0`
 
 2. Once you have the stream, you'll need to split it into multiple files because it's too computationally hard to  process a 3 hour stream. Use the command below to split the file based off of the silence it detects. This may result in longer files if the background sounds/music are as loud as the speech in the source. This command assumes the input stream is `input.wav`:
    `sox -V3 input.wav split.wav silence 1 5.0 0.1% 1 0.3 0.1% : newfile : restart`
@@ -48,3 +51,7 @@ This assumes you're using a Linux system (or WSL) with modern `python3` and `sox
 | large  |   1550 M   |        N/A         |      `large`       |    ~10 GB     |       1x       |
 
 8. Cool, now you have a dataset with the files beginning with `out_` and a log with `transcript.txt`.
+
+# Dataset Cleaning
+(If you really want a clean dataset, this tool will help)
+`python3 process.py`
