@@ -15,7 +15,7 @@ def check_audio_status(audio_process):
         # Audio process is still running
         continue
     # Audio process has finished
-    notif=['/home/rei/dinga.wav','/home/rei/dingd.wav','/home/rei/dingfs.wav']
+    notif=['/dinga.wav','/dingd.wav','/dingfs.wav']
     subprocess.Popen(['mpv', random.choice(notif)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)  # Change the player command as per your system
 
 def play_audio(file_path):
