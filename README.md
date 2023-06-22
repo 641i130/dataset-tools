@@ -12,7 +12,7 @@ This assumes you're using a Linux system (or WSL) with modern `python3` and `sox
    `yt-dlp -f ba -x --audio-format "wav" --audio-quality 0 --embed-metadata https://youtu.be/dh4s0bBrPx0`
 
 2. Once you have the stream, you'll need to split it into multiple files because it's too computationally hard to  process a 3 hour stream. Use the command below to split the file based off of the silence it detects. This may result in longer files if the background sounds/music are as loud as the speech in the source. This command assumes the input stream is `input.wav`:
-   `sox -V3 input.wav split.wav silence 1 5.0 0.1% 1 0.3 0.1% : newfile : restart`
+   `sox input.wav split.wav silence 1 5.0 0.1% 1 0.3 0.1% : newfile : restart`
 
 3. Next, you need to run this through [UVR5](https://ultimatevocalremover.com/) to remove all background sounds. Since we have the files, you can just select all the files as input for the software, and make a folder for the output. Use the following settings once you've set the input and output settings:
 
@@ -33,7 +33,7 @@ This assumes you're using a Linux system (or WSL) with modern `python3` and `sox
 4. Once you have a directory with all the processed files,  we need to run it through `sox` to remove the silence from the lack of background music and sound effects. 
 
    When you're at this step, make sure you're in the folder with the processed wav files.
-   `for file in *.wav; do sox "$file" "desilenced_${file}" silence -l 1 0.1 1% -1 0.1 1%; done `
+   `for file in *.wav; do sox "$file" "desilenced_${file}" silence 1 0.3 1% 1 0.3 1%; done `
 
 5. Now that we have a bunch of audio files of speech, we need to run it through Openai's whisper to transcribe it into use-able data. To do this, install whisper to the system you're using ([guide on this page](https://github.com/openai/whisper/releases)). I've written a python script `whisper_transcript.py` that will do this.
 

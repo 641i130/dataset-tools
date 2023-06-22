@@ -15,12 +15,12 @@ def check_audio_status(audio_process):
         # Audio process is still running
         continue
     # Audio process has finished
-    notif=['/dinga.wav','/dingd.wav','/dingfs.wav']
+    notif=['/home/rei/dinga.wav','/home/rei/dingd.wav','/home/rei/dingfs.wav']
     subprocess.Popen(['mpv', random.choice(notif)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)  # Change the player command as per your system
 
 def play_audio(file_path):
     """Plays the audio file using a system player"""
-    audio_process = subprocess.Popen(['mpv', file_path], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)  # Change the player command as per your system
+    audio_process = subprocess.Popen(['mpv','--speed=2.0', file_path], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)  # Change the player command as per your system
 
     # Start a separate thread to check audio status
     status_thread = threading.Thread(target=check_audio_status, args=(audio_process,))
@@ -96,7 +96,7 @@ def mid(sss,file_path):
 
 def main():
     # Get a list of audio files in the directory
-    audio_files = [file for file in os.listdir(AUDIO_DIR) if file.startswith('out_') and file.endswith('.wav')]
+    #audio_files = [file for file in os.listdir(AUDIO_DIR) if file.startswith('out_') and file.endswith('.wav')]
 
     with open(LOG_FILE, 'r') as files:
         for line in files:
@@ -114,6 +114,8 @@ def main():
                     print("u - Good")
                     print("h - Bad")
                     print("t - Mid")
+                    print("r - Repeat")
+                    print("Anything else - exit")
                     action = input("Enter command:")
                     if action == 'u':
                         # GOod!
@@ -129,13 +131,35 @@ def main():
                         break
                     elif action == 'r':
                         # replay audio
+                        print(str(read_text(file)).center(terminal_width))
                         process = play_audio(file_path)
                     else:
-                        pass
+                        exit()
                 break
             process.terminate()
+
+def clean():
+    """Move all unusable files to different folders"""
+    move_files_from_list('mid.txt', 'mid')
+    move_files_from_list('bad.txt', 'bad')
+
+def move_files_from_list(filename, destination_folder):
+    """Move files listed in the given file to the specified destination folder"""
+    with open(filename, 'r') as file:
+        for line in file:
+            file_path = line.strip().split('|')[0]
+            filename = os.path.basename(file_path)
+            destination_path = os.path.join(destination_folder, filename)
+
+            os.makedirs(destination_folder, exist_ok=True)  # Create the destination folder if it doesn't exist
+
+            shutil.move(file_path, destination_path)
+
 
 
 if __name__ == '__main__':
     main()
+    print("You did it!")
+    clean()
+
 
