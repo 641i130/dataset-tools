@@ -8,7 +8,7 @@ terminal_width, _ = shutil.get_terminal_size()
 # Directory containing audio files
 AUDIO_DIR = '.'
 # Path to the text file containing filenames and text
-LOG_FILE = 'log.txt'
+LOG_FILE = 'transcript.txt'
 
 def check_audio_status(audio_process):
     while audio_process.poll() is None:
@@ -16,7 +16,7 @@ def check_audio_status(audio_process):
         continue
     # Audio process has finished
     notif=['/home/rei/dinga.wav','/home/rei/dingd.wav','/home/rei/dingfs.wav']
-    subprocess.Popen(['mpv', random.choice(notif)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)  # Change the player command as per your system
+    subprocess.Popen(['mpv', '--volume=50', random.choice(notif)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)  # Change the player command as per your system
 
 def play_audio(file_path):
     """Plays the audio file using a system player"""
@@ -99,12 +99,14 @@ def main():
     #audio_files = [file for file in os.listdir(AUDIO_DIR) if file.startswith('out_') and file.endswith('.wav')]
 
     with open(LOG_FILE, 'r') as files:
-        for line in files:
+        file_list = files.readlines()  # Read all lines into a list
+        total_files = len(file_list)  # Get the total number of files
+        
+        for index, line in enumerate(file_list, start=1):
             file = line.strip().split('|')[0]
-            # Iterate through the audio files
+            file_path = os.path.join(AUDIO_DIR, file)
             while True:
-                file_path = os.path.join(AUDIO_DIR, file)
-                print(f"Playing file: {file_path}")
+                print(f"Playing file: {file_path} File Number: {index} out of {total_files}")                
                 print(str(read_text(file)).center(terminal_width))
                 process = play_audio(file_path)
 

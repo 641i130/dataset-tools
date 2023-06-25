@@ -1,6 +1,6 @@
 import os, whisper, shutil
 
-model = whisper.load_model("large")
+model = whisper.load_model("medium")
 directory = "."  # Replace with the actual directory path
 log_file = "transcript.txt"
 def wfile(content):
@@ -27,11 +27,12 @@ for filename in os.listdir(directory):
         mel = whisper.log_mel_spectrogram(audio).to(model.device)
 
         # Detect the spoken language
-        _, probs = model.detect_language(mel)
-        print(f"Detected language for {filename}: {max(probs, key=probs.get)}")
+        #_, probs = model.detect_language(mel)
+        #print(f"Detected language for {filename}: {max(probs, key=probs.get)}")
 
-        # Decode the audio
-        options = whisper.DecodingOptions()
+        # Decode the audio (change if you want a different lang)
+        #options = whisper.DecodingOptions()
+        options = whisper.DecodingOptions(language="en")
         result = whisper.decode(model, mel, options)
 
         # Print the recognized text
