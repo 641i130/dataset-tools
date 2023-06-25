@@ -36,12 +36,12 @@ def read_text(file_path):
                 return text
     return None
 
-def good(sss,file_path):
+def good(sss):
     """Re-processes a file (placeholder function)"""
     # Add your re-processing logic here
     # Do nothing to the log fil
     # Read the file
-    with open(file_path, 'r') as file:
+    with open(LOG_FILE, 'r') as file:
         lines = file.readlines()
 
     # Remove lines starting with the given string
@@ -49,7 +49,7 @@ def good(sss,file_path):
     lines = [line for line in lines if not line.startswith(sss)]
 
     # Write the modified contents back to the file
-    with open(file_path, 'w') as file:
+    with open(LOG_FILE, 'w') as file:
         file.writelines(lines)
 
     # Write removed lines to the destination file
@@ -57,10 +57,32 @@ def good(sss,file_path):
         removed_file.writelines(removed_lines)
 
 
-def bad(sss,file_path):
+def update(sss, new_string):
+    """Updates the string and adds it back to LOG_FILE"""
+    # Read the file
+    with open(LOG_FILE, 'r') as file:
+        lines = file.readlines()
+
+    # Remove lines starting with the given string
+    removed_lines = [line for line in lines if line.startswith(sss)]
+    lines = [line for line in lines if not line.startswith(sss)]
+    
+    # Append the new string to the top of the lines
+    new_string = str(sss) + "|" + new_string + '\n'
+    lines.insert(0, new_string)
+
+    # Write the modified contents back to the file
+    with open(LOG_FILE, 'w') as file:
+        file.writelines(lines)
+
+    # Write removed lines to the destination file
+    with open(LOG_FILE, 'a') as removed_file:
+        removed_file.writelines(removed_lines)
+
+def bad(sss):
     """Marks a file as ready (placeholder function)"""
     # Read the file
-    with open(file_path, 'r') as file:
+    with open(LOG_FILE, 'r') as file:
         lines = file.readlines()
 
     # Remove lines starting with the given string
@@ -68,17 +90,17 @@ def bad(sss,file_path):
     lines = [line for line in lines if not line.startswith(sss)]
 
     # Write the modified contents back to the file
-    with open(file_path, 'w') as file:
+    with open(LOG_FILE, 'w') as file:
         file.writelines(lines)
 
     # Write removed lines to the destination file
     with open('bad.txt', 'a') as removed_file:
         removed_file.writelines(removed_lines)
 
-def mid(sss,file_path):
+def mid(sss):
     """Could use some reprocessing..."""
     # Read the file
-    with open(file_path, 'r') as file:
+    with open(LOG_FILE, 'r') as file:
         lines = file.readlines()
 
     # Remove lines starting with the given string
@@ -86,7 +108,7 @@ def mid(sss,file_path):
     lines = [line for line in lines if not line.startswith(sss)]
 
     # Write the modified contents back to the file
-    with open(file_path, 'w') as file:
+    with open(LOG_FILE, 'w') as file:
         file.writelines(lines)
 
     # Write removed lines to the destination file
@@ -115,24 +137,26 @@ def main():
                     print("Commands:")
                     print("u - Good")
                     print("h - Bad")
-                    print("t - Mid")
                     print("r - Repeat")
+                    print("e - Edit")
                     print("Anything else - exit")
                     action = input("Enter command:")
                     if action == 'u':
                         # GOod!
-                        good(file,LOG_FILE)
+                        good(file)
                         break
                     elif action == 'h':
                         # BAD
-                        bad(file,LOG_FILE)
-                        break
-                    elif action == 't':
-                        # mid
-                        mid(file,LOG_FILE)
+                        bad(file)
                         break
                     elif action == 'r':
                         # replay audio
+                        print(str(read_text(file)).center(terminal_width))
+                        process = play_audio(file_path)
+                    elif action == 'e':
+                        print(str(read_text(file)).center(terminal_width))
+                        n_string = input("Edit: ")
+                        update(file,n_string)
                         print(str(read_text(file)).center(terminal_width))
                         process = play_audio(file_path)
                     else:
@@ -142,8 +166,8 @@ def main():
 
 def clean():
     """Move all unusable files to different folders"""
-    move_files_from_list('mid.txt', 'mid')
     move_files_from_list('bad.txt', 'bad')
+    move_files_from_list('good.txt', 'good')
 
 def move_files_from_list(filename, destination_folder):
     """Move files listed in the given file to the specified destination folder"""
@@ -152,10 +176,11 @@ def move_files_from_list(filename, destination_folder):
             file_path = line.strip().split('|')[0]
             filename = os.path.basename(file_path)
             destination_path = os.path.join(destination_folder, filename)
-
             os.makedirs(destination_folder, exist_ok=True)  # Create the destination folder if it doesn't exist
-
-            shutil.move(file_path, destination_path)
+            try:
+                shutil.move(file_path, destination_path)
+            except:
+                pass
 
 
 
